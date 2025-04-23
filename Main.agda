@@ -10,6 +10,8 @@ postulate
     Contains : Point → Line → Set
 
 record Segment : Set where
+    constructor
+        segment 
     field
         point1 point2 : Point
 
@@ -20,9 +22,9 @@ record Angle : Set where
     constructor
         angle 
     field
-        line1 : Line
-        line2 : Line
-        degree : Nat
+        seg1 : Segment
+        seg2 : Segment
+        -- degree : Nat
     
 record Triangle' : Set where
     constructor
@@ -46,8 +48,17 @@ record Triangle : Set where
     side3 = record { point1 = point1 ; point2 = point2 }
 
     angle1 : Angle
-    angle1 = {!   !}
+    angle1 = angle side2 side3 
+
+    angle2 : Angle
+    angle2 = angle side3 side1 
     
+    angle3 : Angle
+    angle3 = angle side1 side2
+
+postulate
+    Angle= : Angle → Angle → Set
+     
 postulate
     Distance : Nat → Set 
 
@@ -68,8 +79,8 @@ if_then_else_ : {A : Set} → Bool → A → A → A
 if true then x else y = x
 if false then x else y = y
 
-isRightAngle : Angle → Bool
-isRightAngle a = if (Angle.degree a == 90) then true else false
+--isRightAngle : Angle → Bool
+--isRightAngle a = if (Angle.degree a == 90) then true else false
 
 _and_ : Bool → Bool → Bool
 _and_ true true = true 
@@ -84,5 +95,6 @@ postulate
 --equalTriangle : Triangle → Triangle → Bool
 --equalTriangle (triangle line1 line2 ang) (triangle line3 line4 ang₁) = if ((lineEq line1 line3 and lineEq line2 line4) and angleEq ang ang₁) then true else false 
 
-sas : (t1 t2 : Triangle) → Segment= (Triangle.side1 t1) (Triangle.side1 t2) → Segment= (Triangle.side2 t1) (Triangle.side2 t2) → {!   !}
-sas = {!   !}
+sas-base : (t1 t2 : Triangle) → Segment= (Triangle.side1 t1) (Triangle.side1 t2) → Segment= (Triangle.side2 t1) (Triangle.side2 t2) 
+    → Angle= (Triangle.angle3 t1) (Triangle.angle3 t2) → Segment= (Triangle.side3 t1) (Triangle.side3 t2) 
+sas-base a b s1 s2 a3  = {!   !}
