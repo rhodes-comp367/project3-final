@@ -3,9 +3,8 @@ module Main where
 open import Agda.Builtin.Nat
 open import Agda.Builtin.Bool
 
-
-postulate
-    -- Definitions 
+-- Definitions
+postulate 
     Point : Set 
     Line : Set
     Contains : Point → Line → Set
@@ -17,10 +16,6 @@ record Segment : Set where
 postulate
     Segment= : Segment → Segment → Set
 
-postulate
-    -- Postulates 1
-    drawLine : (A B : Point) → Line
-
 record Angle : Set where
     constructor
         angle 
@@ -29,7 +24,7 @@ record Angle : Set where
         line2 : Line
         degree : Nat
     
-record Triangle : Set where
+record Triangle' : Set where
     constructor
         triangle 
     field 
@@ -37,7 +32,7 @@ record Triangle : Set where
         line2 : Line
         ang : Angle
 
-record Triangle' : Set where
+record Triangle : Set where
     field
         point1 point2 point3 : Point
     
@@ -63,6 +58,12 @@ record Circle (n : Nat) : Set where
         center : Point
         radius : Distance n
 
+-- Euclid 5 postulates
+postulate
+    -- Postulate 1
+    drawLine : (A B : Point) → Line
+    
+
 if_then_else_ : {A : Set} → Bool → A → A → A
 if true then x else y = x
 if false then x else y = y
@@ -80,8 +81,8 @@ postulate
     angleEq : Angle → Angle → Bool
 
 -- Proposition 4
-equalTriangle : Triangle → Triangle → Bool
-equalTriangle (triangle line1 line2 ang) (triangle line3 line4 ang₁) = if ((lineEq line1 line3 and lineEq line2 line4) and angleEq ang ang₁) then true else false 
+--equalTriangle : Triangle → Triangle → Bool
+--equalTriangle (triangle line1 line2 ang) (triangle line3 line4 ang₁) = if ((lineEq line1 line3 and lineEq line2 line4) and angleEq ang ang₁) then true else false 
 
-sas : (t1 t2 : Triangle') → Segment= (Triangle'.side1 t1) (Triangle'.side1 t2) → Segment= (Triangle'.side2 t1) (Triangle'.side2 t2) → {!   !}
+sas : (t1 t2 : Triangle) → Segment= (Triangle.side1 t1) (Triangle.side1 t2) → Segment= (Triangle.side2 t1) (Triangle.side2 t2) → {!   !}
 sas = {!   !}
