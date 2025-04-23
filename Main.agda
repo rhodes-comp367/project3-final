@@ -5,9 +5,20 @@ open import Agda.Builtin.Bool
 
 
 postulate
+    -- Definitions 
     Point : Set 
     Line : Set
     Contains : Point → Line → Set
+
+record Segment : Set where
+    field
+        point1 point2 : Point
+
+postulate
+    Segment= : Segment → Segment → Set
+
+postulate
+    -- Postulates 1
     drawLine : (A B : Point) → Line
 
 record Angle : Set where
@@ -24,7 +35,23 @@ record Triangle : Set where
     field 
         line1 : Line
         line2 : Line
-        ang : Angle 
+        ang : Angle
+
+record Triangle' : Set where
+    field
+        point1 point2 point3 : Point
+    
+    side1 : Segment
+    side1 = record { point1 = point2 ; point2 = point3 }
+
+    side2 : Segment
+    side2 = record { point1 = point3 ; point2 = point1 }
+
+    side3 : Segment
+    side3 = record { point1 = point1 ; point2 = point2 }
+
+    angle1 : Angle
+    angle1 = {!   !}
     
 postulate
     Distance : Nat → Set 
@@ -56,4 +83,5 @@ postulate
 equalTriangle : Triangle → Triangle → Bool
 equalTriangle (triangle line1 line2 ang) (triangle line3 line4 ang₁) = if ((lineEq line1 line3 and lineEq line2 line4) and angleEq ang ang₁) then true else false 
 
-
+sas : (t1 t2 : Triangle') → Segment= (Triangle'.side1 t1) (Triangle'.side1 t2) → Segment= (Triangle'.side2 t1) (Triangle'.side2 t2) → {!   !}
+sas = {!   !}
