@@ -2,6 +2,8 @@ module Main where
 
 open import Agda.Builtin.Nat
 open import Agda.Builtin.Bool
+open import Relation.Binary.PropositionalEquality using (_≡_; refl)
+
 
 -- Definitions
 postulate 
@@ -15,8 +17,20 @@ record Segment : Set where
     field
         point1 point2 : Point
 
+data Point= : Point → Point → Set where
+  point= : ∀ {p} → Point= p p
+
+point-refl : (p : Point) → Point= p p
+point-refl _ = point=
+
 postulate
     Segment= : Segment → Segment → Set
+
+data Seg= : Segment → Segment → Set where
+  seg= : ∀ {s1 s2} → Seg= s1 s2
+
+seg-refl : (s s1 : Segment) → Seg= s s1  
+seg-refl s s1 = seg= 
 
 record Angle : Set where
     constructor
@@ -95,6 +109,13 @@ postulate
 --equalTriangle : Triangle → Triangle → Bool
 --equalTriangle (triangle line1 line2 ang) (triangle line3 line4 ang₁) = if ((lineEq line1 line3 and lineEq line2 line4) and angleEq ang ang₁) then true else false 
 
-sas-base : (t1 t2 : Triangle) → Segment= (Triangle.side1 t1) (Triangle.side1 t2) → Segment= (Triangle.side2 t1) (Triangle.side2 t2) 
-    → Angle= (Triangle.angle3 t1) (Triangle.angle3 t2) → Segment= (Triangle.side3 t1) (Triangle.side3 t2) 
-sas-base a b s1 s2 a3  = {!   !}
+sas-base : (t1 t2 : Triangle) → Seg= (Triangle.side1 t1) (Triangle.side1 t2) → Seg= (Triangle.side2 t1) (Triangle.side2 t2) 
+    → Angle= (Triangle.angle3 t1) (Triangle.angle3 t2) → Seg= (Triangle.side3 t1) (Triangle.side3 t2) 
+sas-base a b s1 s2 a3  = seg-refl (segment (Triangle.point1 a) (Triangle.point2 a)) (segment (Triangle.point1 b) (Triangle.point2 b)) 
+
+postulate 
+    sas-angle2 : (t1 t2 : Triangle) → Seg= (Triangle.side1 t1) (Triangle.side1 t2) → Seg= (Triangle.side2 t1) (Triangle.side2 t2) 
+        → Angle= (Triangle.angle3 t1) (Triangle.angle3 t2) → Angle= (Triangle.angle2 t1) (Triangle.angle2 t2)
+        
+    sas-angle3 : (t1 t2 : Triangle) → Seg= (Triangle.side1 t1) (Triangle.side1 t2) → Seg= (Triangle.side2 t1) (Triangle.side2 t2) 
+        → Angle= (Triangle.angle3 t1) (Triangle.angle3 t2) → Angle= (Triangle.angle3 t1) (Triangle.angle3 t2)
