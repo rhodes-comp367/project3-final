@@ -153,7 +153,11 @@ create_equiTri : (ab : Segment) → (c1 c2 : Circle)
     → Point= (Circle.center c1) (Segment.point1 ab) → Point= (Circle.center c2) (Segment.point2 ab) 
     → Point= (Circle.redge c1) (Circle.center c2) → Point= (Circle.center c1) (Circle.redge c2) 
     → Point= (Circle.edge c1) (Circle.edge c2) → EquilTri
-create_equiTri (segment a b) (circle .a edge .b) (circle .b .edge .a) point= point= point= point= point= = record { p1 = b ; p2 = b ; p3 = edge } 
+create_equiTri (segment a b) (circle .a edge .b) (circle .b .edge .a) point= point= point= point= point= = record { p1 = a ; p2 = b ; p3 = edge } 
+
+-- Proposition 2
+SegSet : (a : Point) → (bc : Segment) → (ad : Segment) → Point= (Segment.point1 ad) a → Seg= ad bc → Segment   
+SegSet a (segment b c) (segment .a d) point= seg= = segment a d
 
 -- Proposition 4
 sas-base : (t1 t2 : Triangle) → Seg= (Triangle.side1 t1) (Triangle.side1 t2) → Seg= (Triangle.side2 t1) (Triangle.side2 t2) 
@@ -167,7 +171,7 @@ postulate
         
     sas-angle3 : (t1 t2 : Triangle) → Seg= (Triangle.side1 t1) (Triangle.side1 t2) → Seg= (Triangle.side2 t1) (Triangle.side2 t2) 
         → Ang= (Triangle.angle3 t1) (Triangle.angle3 t2) → Ang= (Triangle.angle3 t1) (Triangle.angle3 t2)
- 
+
 -- Proposition 6 : If in a triangle two angles equal one another, then the sides opposite the equal angles also equal one another.
 prop6_ang12 : (t1 : Triangle) → Ang= (Triangle.angle1 t1) (Triangle.angle2 t1) → Seg= (Triangle.side1 t1) (Triangle.side2 t1)
 prop6_ang12 record { p1 = point1 ; p2 = point2 ; p3 = point3 } ang= = seg=  
