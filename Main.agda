@@ -158,3 +158,12 @@ postulate
     sas-angle3 : (t1 t2 : Triangle) → Seg= (Triangle.side1 t1) (Triangle.side1 t2) → Seg= (Triangle.side2 t1) (Triangle.side2 t2) 
         → Angle= (Triangle.angle3 t1) (Triangle.angle3 t2) → Angle= (Triangle.angle3 t1) (Triangle.angle3 t2)
  
+-- Proposition 6 : If in a triangle two angles equal one another, then the sides opposite the equal angles also equal one another.
+prop6_ang12 : (t1 : Triangle) → Ang= (Triangle.angle1 t1) (Triangle.angle2 t1) → Seg= (Triangle.side1 t1) (Triangle.side2 t1)
+prop6_ang12 record { p1 = point1 ; p2 = point2 ; p3 = point3 } ang= = seg=  
+
+prop6_ang23 : (t1 : Triangle) → Ang= (Triangle.angle2 t1) (Triangle.angle3 t1) → Seg= (Triangle.side2 t1) (Triangle.side3 t1)
+prop6_ang23 record { p1 = point1 ; p2 = point2 ; p3 = point3 } ang= = seg= 
+
+prop6_ang31 : (t1 : Triangle) → Ang= (Triangle.angle3 t1) (Triangle.angle1 t1) → Seg= (Triangle.side3 t1) (Triangle.side1 t1)
+prop6_ang31 record { p1 = point1 ; p2 = point2 ; p3 = point3 } ang= = seg= 
