@@ -147,16 +147,16 @@ create_equiTri (segment a b) (circle .a edge .b) (circle .b .edge .a) point= poi
 
 -- Proposition 4
 sas-base : (t1 t2 : Triangle) → Seg= (Triangle.side1 t1) (Triangle.side1 t2) → Seg= (Triangle.side2 t1) (Triangle.side2 t2) 
-    → Angle= (Triangle.angle3 t1) (Triangle.angle3 t2) → Seg= (Triangle.side3 t1) (Triangle.side3 t2) 
+    → Ang= (Triangle.angle3 t1) (Triangle.angle3 t2) → Seg= (Triangle.side3 t1) (Triangle.side3 t2) 
 sas-base a b s1 s2 a3  = seg-refl (segment (Triangle.p1 a) (Triangle.p2 a)) (segment (Triangle.p1 b) (Triangle.p2 b)) 
 
 postulate 
     -- Hilbert Congruence 6
     sas-angle2 : (t1 t2 : Triangle) → Seg= (Triangle.side1 t1) (Triangle.side1 t2) → Seg= (Triangle.side2 t1) (Triangle.side2 t2) 
-        → Angle= (Triangle.angle3 t1) (Triangle.angle3 t2) → Angle= (Triangle.angle2 t1) (Triangle.angle2 t2)
+        → Ang= (Triangle.angle3 t1) (Triangle.angle3 t2) → Ang= (Triangle.angle2 t1) (Triangle.angle2 t2)
         
     sas-angle3 : (t1 t2 : Triangle) → Seg= (Triangle.side1 t1) (Triangle.side1 t2) → Seg= (Triangle.side2 t1) (Triangle.side2 t2) 
-        → Angle= (Triangle.angle3 t1) (Triangle.angle3 t2) → Angle= (Triangle.angle3 t1) (Triangle.angle3 t2)
+        → Ang= (Triangle.angle3 t1) (Triangle.angle3 t2) → Ang= (Triangle.angle3 t1) (Triangle.angle3 t2)
  
 -- Proposition 6 : If in a triangle two angles equal one another, then the sides opposite the equal angles also equal one another.
 prop6_ang12 : (t1 : Triangle) → Ang= (Triangle.angle1 t1) (Triangle.angle2 t1) → Seg= (Triangle.side1 t1) (Triangle.side2 t1)
