@@ -92,7 +92,8 @@ record EquilTri : Set where
     side3 : Segment
     side3 = record { point1 = p1 ; point2 = p2 }
 
-    side12 : Seg= side1 side2
+    field
+        side12 : Segment= side1 side2
     side12 = seg=
 
     side23 : Seg= side2 side3
@@ -158,6 +159,9 @@ create_equiTri (segment a b) (circle .a edge .b) (circle .b .edge .a) point= poi
 -- Proposition 2
 SegSet : (a : Point) → (bc : Segment) → (ad : Segment) → Point= (Segment.point1 ad) a → Seg= ad bc → Segment   
 SegSet a (segment b c) (segment .a d) point= seg= = segment a d
+
+-- Proposition 3
+
 
 -- Proposition 4
 sas-base : (t1 t2 : Triangle) → Seg= (Triangle.side1 t1) (Triangle.side1 t2) → Seg= (Triangle.side2 t1) (Triangle.side2 t2) 
