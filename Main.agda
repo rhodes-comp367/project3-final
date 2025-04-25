@@ -138,6 +138,7 @@ _and_ true true = true
 _and_ false _ = false 
 _and_ _ false = false 
 
+ 
 -- Proposition 1
 create_equiTri : (ab : Segment) → (c1 c2 : Circle) 
     → Point= (Circle.center c1) (Segment.point1 ab) → Point= (Circle.center c2) (Segment.point2 ab) 
@@ -166,4 +167,4 @@ prop6_ang23 : (t1 : Triangle) → Ang= (Triangle.angle2 t1) (Triangle.angle3 t1)
 prop6_ang23 record { p1 = point1 ; p2 = point2 ; p3 = point3 } ang= = seg= 
 
 prop6_ang31 : (t1 : Triangle) → Ang= (Triangle.angle3 t1) (Triangle.angle1 t1) → Seg= (Triangle.side3 t1) (Triangle.side1 t1)
-prop6_ang31 record { p1 = point1 ; p2 = point2 ; p3 = point3 } ang= = seg= 
+prop6_ang31 record { p1 = point1 ; p2 = point2 ; p3 = point3 } ang= = seg=  
