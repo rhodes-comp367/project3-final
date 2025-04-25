@@ -110,6 +110,15 @@ record EquilTri : Set where
     angle3 : Angle
     angle3 = angle side1 side2
 
+    angle12 : Ang= angle1 angle2
+    angle12 = ang=
+
+    angle23 : Ang= angle2 angle3
+    angle23 = ang=
+
+    angle31 : Ang= angle3 angle1
+    angle31 = ang=
+
 record Circle : Set where
     constructor
         circle
