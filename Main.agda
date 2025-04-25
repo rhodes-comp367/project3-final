@@ -11,17 +11,17 @@ postulate
     Line : Set
     Contains : Point → Line → Set
 
-record Segment : Set where
-    constructor
-        segment 
-    field
-        point1 point2 : Point
-
 data Point= : Point → Point → Set where
   point= : ∀ {p} → Point= p p
 
 point-refl : (p : Point) → Point= p p
 point-refl _ = point=
+
+record Segment : Set where
+    constructor
+        segment 
+    field
+        point1 point2 : Point
 
 postulate
     Segment= : Segment → Segment → Set
@@ -29,8 +29,11 @@ postulate
 data Seg= : Segment → Segment → Set where
   seg= : ∀ {s1 s2} → Seg= s1 s2
 
-seg-refl : (s s1 : Segment) → Seg= s s1  
-seg-refl s s1 = seg= 
+seg-refl : (s1 s2 : Segment) → Seg= s1 s2  
+seg-refl s1 s2 = seg= 
+
+postulate
+    Distance : Nat → Set 
 
 record Angle : Set where
     constructor
@@ -39,7 +42,13 @@ record Angle : Set where
         seg1 : Segment
         seg2 : Segment
         -- degree : Nat
+
+postulate
+    Angle= : Angle → Angle → Set
     
+data Ang= : Angle → Angle → Set where
+  ang= : ∀ {a1 a2} → Ang= a1 a2
+
 record Triangle' : Set where
     constructor
         triangle 
@@ -50,16 +59,47 @@ record Triangle' : Set where
 
 record Triangle : Set where
     field
-        point1 point2 point3 : Point
+        p1 p2 p3 : Point
     
     side1 : Segment
-    side1 = record { point1 = point2 ; point2 = point3 }
+    side1 = record { point1 = p2 ; point2 = p3 }
 
     side2 : Segment
-    side2 = record { point1 = point3 ; point2 = point1 }
+    side2 = record { point1 = p3 ; point2 = p1 }
 
     side3 : Segment
-    side3 = record { point1 = point1 ; point2 = point2 }
+    side3 = record { point1 = p1 ; point2 = p2 }
+
+    angle1 : Angle
+    angle1 = angle side2 side3 
+
+    angle2 : Angle
+    angle2 = angle side3 side1 
+    
+    angle3 : Angle
+    angle3 = angle side1 side2
+    
+record EquilTri : Set where
+    field
+        p1 p2 p3 : Point
+    
+    side1 : Segment
+    side1 = record { point1 = p2 ; point2 = p3 }
+
+    side2 : Segment
+    side2 = record { point1 = p3 ; point2 = p1 }
+
+    side3 : Segment
+    side3 = record { point1 = p1 ; point2 = p2 }
+
+    side12 : Seg= side1 side2
+    side12 = seg=
+
+    side23 : Seg= side2 side3
+    side23 = seg=
+
+    side31 : Seg= side3 side1
+    side31 = seg=
 
     angle1 : Angle
     angle1 = angle side2 side3 
@@ -70,24 +110,21 @@ record Triangle : Set where
     angle3 : Angle
     angle3 = angle side1 side2
 
-postulate
-    Angle= : Angle → Angle → Set
-     
-postulate
-    Distance : Nat → Set 
-
-record Circle (n : Nat) : Set where
+record Circle : Set where
     constructor
         circle
     field 
-        center : Point
-        radius : Distance n
+        center edge redge : Point
 
--- Euclid 5 postulates
+    radius : Segment
+    radius = segment center redge
+
+-- Axioms
 postulate
-    -- Postulate 1
+    -- Euclid Postulate 1 / Hilbert Inclidence 1
     drawLine : (A B : Point) → Line
-    
+    -- Postulate 3
+
 
 if_then_else_ : {A : Set} → Bool → A → A → A
 if true then x else y = x
@@ -101,21 +138,23 @@ _and_ true true = true
 _and_ false _ = false 
 _and_ _ false = false 
 
-postulate
-    lineEq : Line → Line → Bool
-    angleEq : Angle → Angle → Bool
+-- Proposition 1
+create_equiTri : (ab : Segment) → (c1 c2 : Circle) 
+    → Point= (Circle.center c1) (Segment.point1 ab) → Point= (Circle.center c2) (Segment.point2 ab) 
+    → Point= (Circle.redge c1) (Circle.center c2) → Point= (Circle.center c1) (Circle.redge c2) 
+    → Point= (Circle.edge c1) (Circle.edge c2) → EquilTri
+create_equiTri (segment a b) (circle .a edge .b) (circle .b .edge .a) point= point= point= point= point= = record { p1 = b ; p2 = b ; p3 = edge } 
 
 -- Proposition 4
---equalTriangle : Triangle → Triangle → Bool
---equalTriangle (triangle line1 line2 ang) (triangle line3 line4 ang₁) = if ((lineEq line1 line3 and lineEq line2 line4) and angleEq ang ang₁) then true else false 
-
 sas-base : (t1 t2 : Triangle) → Seg= (Triangle.side1 t1) (Triangle.side1 t2) → Seg= (Triangle.side2 t1) (Triangle.side2 t2) 
     → Angle= (Triangle.angle3 t1) (Triangle.angle3 t2) → Seg= (Triangle.side3 t1) (Triangle.side3 t2) 
-sas-base a b s1 s2 a3  = seg-refl (segment (Triangle.point1 a) (Triangle.point2 a)) (segment (Triangle.point1 b) (Triangle.point2 b)) 
+sas-base a b s1 s2 a3  = seg-refl (segment (Triangle.p1 a) (Triangle.p2 a)) (segment (Triangle.p1 b) (Triangle.p2 b)) 
 
 postulate 
+    -- Hilbert Congruence 6
     sas-angle2 : (t1 t2 : Triangle) → Seg= (Triangle.side1 t1) (Triangle.side1 t2) → Seg= (Triangle.side2 t1) (Triangle.side2 t2) 
         → Angle= (Triangle.angle3 t1) (Triangle.angle3 t2) → Angle= (Triangle.angle2 t1) (Triangle.angle2 t2)
         
     sas-angle3 : (t1 t2 : Triangle) → Seg= (Triangle.side1 t1) (Triangle.side1 t2) → Seg= (Triangle.side2 t1) (Triangle.side2 t2) 
         → Angle= (Triangle.angle3 t1) (Triangle.angle3 t2) → Angle= (Triangle.angle3 t1) (Triangle.angle3 t2)
+ 
