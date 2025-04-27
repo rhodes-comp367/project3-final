@@ -153,14 +153,15 @@ seg-sym : (a b : Segment) → Segment= a b → Segment= b a
 seg-sym a b ab = seg-eq b a
 
 -- Proposition 2
-SegSet : (a : Point) → (bc : Segment) → (ab : Segment) → (d : Point) → (abd : EquilTri) → (Cb Cd : Circle) → (da al dl db bg : Segment) 
-    → Point= a (Segment.point1 ab) → Point= (Segment.point1 bc) (Segment.point2 ab) → Point= a (EquilTri.p1 abd) → Point= (Segment.point1 bc) (EquilTri.p2 abd)  → Point= d (EquilTri.p3 abd) 
-    → Point= (Segment.point1 bc) (Circle.center Cb) → Point= (Segment.point2 bc) (Circle.redge Cb) → Point= (Segment.point2 bg) (Circle.edge Cb) → Segment= bc (Circle.radius Cb) 
-    → Point= (Segment.point1 da) (Circle.center Cd) → Point= (Segment.point2 al) (Circle.redge Cd) → Point= (Segment.point2 bg) (Circle.edge Cd) → Segment= dl (Circle.radius Cb)
-    → Segment 
+SegSet : (a : Point) → (bc : Segment) → (ab : Segment) → (d : Point) → (abd : EquilTri) → (Cb Cd : Circle) → (al dl bg : Segment) 
+    → Point= a (Segment.point1 ab) → Point= (Segment.point1 bc) (Segment.point2 ab) → Point= a (EquilTri.p1 abd) → Point= (Segment.point1 bc) (EquilTri.p2 abd)  → Point= d (EquilTri.p3 abd)
+    → Point= a (Segment.point1 al) → Point= d (Segment.point1 dl) → Point= (Segment.point2 al) (Segment.point2 dl) → Point= (Segment.point1 bc) (Segment.point1 bg)
+    → Point= (Segment.point1 bc) (Circle.center Cb) → Point= (Segment.point2 bc) (Circle.redge Cb) → Point= (Segment.point2 bg) (Circle.edge Cb) -- → Segment= bc (Circle.radius Cb) 
+    → Point= d (Circle.center Cd) → Point= (Segment.point2 dl) (Circle.redge Cd) → Point= (Segment.point2 bg) (Circle.edge Cd) -- → Segment= dl (Circle.radius Cb)
+    → Segment= al bg 
 SegSet A (segment B C) (segment A B) D (equiltri A B D side12 side23 side31) 
-    (circle B G C) g h i j k (segment p1 G) 
-    point= point= point= point= point= point= point= point= u v w x y = {!  !}
+    (circle B G C) (circle D G L) (segment A L) (segment D L) (segment B G) 
+    point= point= point= point= point= point= point= point= point= point= point= point=  point= point= point=  = seg-eq ((segment A L)) ((segment B G))
 
 -- Proposition 3
 
