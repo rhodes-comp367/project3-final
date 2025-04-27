@@ -9,7 +9,8 @@ open import Relation.Binary.PropositionalEquality using (_≡_; refl)
 postulate 
     Point : Set 
     Line : Set
-    Contains : Point → Line → Set
+    Line-Contains-Point : Point → Line → Set
+
 
 data Point= : Point → Point → Set where
   point= : ∀ {p} → Point= p p
@@ -24,6 +25,7 @@ record Segment : Set where
         point1 point2 : Point
 
 postulate
+    Line-Contains-Segment : Segment → Line → Set
     Segment= : Segment → Segment → Set
     seg-eq : (s1 s2 : Segment) → Segment= s1 s2  
 
@@ -99,6 +101,7 @@ record EquilTri : Set where
         side23 : Segment= side2 side3
         side31 : Segment= side3 side1
 
+-- Euclid's Postulate 3
 record Circle : Set where
     constructor
         circle
@@ -112,7 +115,9 @@ record Circle : Set where
 postulate
     -- Euclid Postulate 1 / Hilbert Inclidence 1
     drawLine : (A B : Point) → Line
-    -- Postulate 3
+    drawSeg : (A B : Point) → Segment
+    -- Postulate 2
+    extendsSeg : (ab : Line) → (AB : Segment) → Line-Contains-Segment AB ab → Segment
 
 
 if_then_else_ : {A : Set} → Bool → A → A → A
@@ -128,17 +133,34 @@ _and_ false _ = false
 _and_ _ false = false 
 
  
--- Proposition 1
+-- Proposition 1: forming an equilateral triangle from a single segment
 create_equiTri : (ab : Segment) → (c1 c2 : Circle) 
     → Point= (Circle.center c1) (Segment.point1 ab) → Point= (Circle.center c2) (Segment.point2 ab) 
     → Point= (Circle.redge c1) (Circle.center c2) → Point= (Circle.center c1) (Circle.redge c2) 
     → Point= (Circle.edge c1) (Circle.edge c2) → EquilTri
 create_equiTri (segment a b) (circle .a edge .b) (circle .b .edge .a) point= point= point= point= point= 
     = equiltri a b edge (seg-eq (segment b edge) (segment edge a)) (seg-eq (segment edge a) (segment a b)) (seg-eq (segment a  b) (segment b edge)) 
-    
+
+postulate
+    -- application of Proposition 1: From a segment, identify a third point that would form an equilateral triangle
+    Pro-1 : (ab : Segment) → Point
+
+-- Helper for proporsition 2
+seg-trans : (a b c : Segment) → Segment= a b → Segment= b c → Segment= a c
+seg-trans a b c ab bc  = seg-eq a c 
+
+seg-sym : (a b : Segment) → Segment= a b → Segment= b a 
+seg-sym a b ab = seg-eq b a
+
 -- Proposition 2
-SegSet : (a : Point) → (bc : Segment) → (ad : Segment) → Point= (Segment.point1 ad) a → Seg= ad bc → Segment   
-SegSet a (segment b c) (segment .a d) point= seg= = segment a d
+SegSet : (a : Point) → (bc : Segment) → (ab : Segment) → (d : Point) → (abd : EquilTri) → (Cb Cd : Circle) → (da al dl db bg : Segment) 
+    → Point= a (Segment.point1 ab) → Point= (Segment.point1 bc) (Segment.point2 ab) → Point= a (EquilTri.p1 abd) → Point= (Segment.point1 bc) (EquilTri.p2 abd)  → Point= d (EquilTri.p3 abd) 
+    → Point= (Segment.point1 bc) (Circle.center Cb) → Point= (Segment.point2 bc) (Circle.redge Cb) → Point= (Segment.point2 bg) (Circle.edge Cb) → Segment= bc (Circle.radius Cb) 
+    → Point= (Segment.point1 da) (Circle.center Cd) → Point= (Segment.point2 al) (Circle.redge Cd) → Point= (Segment.point2 bg) (Circle.edge Cd) → Segment= dl (Circle.radius Cb)
+    → Segment 
+SegSet A (segment B C) (segment A B) D (equiltri A B D side12 side23 side31) 
+    (circle B G C) g h i j k (segment p1 G) 
+    point= point= point= point= point= point= point= point= u v w x y = {!  !}
 
 -- Proposition 3
 
@@ -149,7 +171,7 @@ sas-base : (t1 t2 : Triangle) → Segment= (Triangle.side1 t1) (Triangle.side1 t
 sas-base a b s1 s2 a3  = seg-eq (segment (Triangle.p1 a) (Triangle.p2 a)) (segment (Triangle.p1 b) (Triangle.p2 b)) 
 
 postulate 
-    -- Hilbert Congruence 6
+    -- Hilbert Congruence 6, part of proposition 2
     sas-angle2 : (t1 t2 : Triangle) → Seg= (Triangle.side1 t1) (Triangle.side1 t2) → Seg= (Triangle.side2 t1) (Triangle.side2 t2) 
         → Ang= (Triangle.angle3 t1) (Triangle.angle3 t2) → Ang= (Triangle.angle2 t1) (Triangle.angle2 t2)
         
