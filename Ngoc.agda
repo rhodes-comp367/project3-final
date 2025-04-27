@@ -12,6 +12,7 @@ postulate
     Contains : Point → Line → Set
     Congruence : Line → Line → Set
     EquilateralTriangle : (A B : Point) → Point
+    
 
 
 data Point= : Point → Point → Set where
@@ -218,7 +219,8 @@ subtract-equal (equiltri d a b side12 side23 side31) (segment .d l) (segment .d 
         da=db : Segment= (segment b d) (segment d a) 
         da=db = EquilTri.side23 (equiltri d a b side12 side23 side31) 
 
-
+postulate 
+    extend : (p1 p2 : Point) → Segment
 prop2 : (A : Point) (BC : Segment) → (circleb circled : Circle) → (DAB : EquilTri)
     → Point= (Segment.point2 BC) (Circle.edge circleb) 
     → Point= (Segment.point1 BC) (Circle.center circleb) 
@@ -226,18 +228,28 @@ prop2 : (A : Point) (BC : Segment) → (circleb circled : Circle) → (DAB : Equ
     → Point= (EquilTri.p2 DAB) A
     → Point= (EquilTri.p3 DAB) (Circle.center circleb) 
     → Segment= (segment A (Circle.edge circled)) BC 
-prop2 a (segment b c) (circle .b .c g) (circle d l redge) (equiltri .d .a .b sideab sidebd sidedb) point= point= point= point= point= 
-    = seg-trans (segment a l) (segment b g) (segment b c) 
+prop2 a (segment b c) (circle .b .c h) (circle d l redge) (equiltri .d .a .b sideab sidebd sidedb) point= point= point= point= point= =
+    seg-trans (segment a l) (segment b g) (segment b c) 
         (segment-minus= 
             (segment d l) (segment d g) 
             (segment d a) (segment d b) 
             (segment a l) (segment b g) (Circle.radius= (circle d l g)) (EquilTri.side32' (equiltri d a b sideab sidebd sidedb))) -- ?0 : Segment= (segment a l) (segment b g)
         (Circle.radius= (circle b g c)) 
+    
     where 
-        da=db : Segment= (segment b d) (segment d a) 
-        da=db = EquilTri.side23 (equiltri d a b sideab sidebd sidedb) 
+    g : Point
+    g = intersection (circle b c h) (segment b f )
+        where 
+        f : Point
+        f = ? 
+
+
+    --where 
+    --    da=db : Segment= (segment b d) (segment d a) 
+    --    da=db = EquilTri.side23 (equiltri d a b sideab sidebd sidedb) 
 
     
 -- prop2 a (segment b c) (circle .b .c g ) (circle d l redge1) point= point= =
     --seg-trans (segment a l) (segment b g) (segment b c) {!   !} {!   !} 
 
+  
