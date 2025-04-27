@@ -97,6 +97,12 @@ record EquilTri : Set where
     side3 : Segment
     side3 = record { point1 = p1 ; point2 = p2 }
 
+    side2' : Segment
+    side2' = record {point1 = p1; point2 = p3}
+
+    side32' : Segment= side3 side2'
+    side32' = seg-eq (segment p1 p2) (segment p1 p3) 
+
     field
         side12 : Segment= side1 side2
         side23 : Segment= side2 side3
@@ -110,6 +116,9 @@ record Circle : Set where
 
     radius : Segment
     radius = segment center redge
+
+    radius= : Segment= (segment center edge) (segment center redge) 
+    radius= = seg-eq (segment center edge) (segment center redge) 
 
 
 drawCircle : (center : Point) (edge : Point) (random : Point) → Circle
@@ -183,8 +192,52 @@ seg-trans a b c ab bc  = seg-eq a c
 seg-sym : (a b : Segment) → Segment= a b → Segment= b a 
 seg-sym a b ab = seg-eq b a
 
+--dab : (A : Point) (BC : Segment) → (DAB : EquilTri) → (circleb circled : Circle) 
+--    → Point= (EquilTri.p1 DAB) (Circle.center circled) 
+--    → Point= (EquilTri.p2 DAB) A
+--    → Point= (EquilTri.p3 DAB) (Circle.center circleb) 
+--    → Segment= (segment A (Circle.egde circled)) (segment (Segment.point1 BC) (Circle.redge circleb))
+--dab = {!   !} 
+postulate
+  segment-minus : Segment → Segment → Segment
+  segment-minus= : (DL DG DA DB AL BG : Segment) → Segment= DL DG → Segment= DA DB → Segment= AL BG 
+
+subtract-equal : (DAB : EquilTri) → (DL DG : Segment) 
+  → Segment= DL DG
+  → Point= (Segment.point1 DL) (EquilTri.p1 DAB) → Point= (Segment.point1 DG) (EquilTri.p1 DAB)
+  → Segment= (segment-minus DL (EquilTri.side3 DAB)) (segment-minus DG (EquilTri.side2 DAB))
+ 
+subtract-equal (equiltri d a b side12 side23 side31) (segment .d l) (segment .d g) dl=dg point= point= = 
+    seg-trans 
+        (segment-minus (segment d l) (segment d a)) 
+        (segment-minus (segment d g) (segment d a)) 
+        (segment-minus (segment d g) (segment b d)) 
+        (seg-eq (segment-minus (segment d l) (segment d a))((segment-minus (segment d g) (segment d a)))) 
+        (seg-eq ((segment-minus (segment d g) (segment d a))) ((segment-minus (segment d g) (segment b d))))
+    where 
+        da=db : Segment= (segment b d) (segment d a) 
+        da=db = EquilTri.side23 (equiltri d a b side12 side23 side31) 
 
 
-proposition2 : (A B C L : Point) → (bg : Circle) → Point= B (Circle.center bg) → Segment= (segment A L) (segment B C)
-proposition2 a b c l (circle centerb edge g) point= = 
-    seg-trans (segment a l)  (segment b g) (segment b c) (seg-eq (segment a l) (segment b g)) (seg-eq (segment b g) (segment b c)) 
+prop2 : (A : Point) (BC : Segment) → (circleb circled : Circle) → (DAB : EquilTri)
+    → Point= (Segment.point2 BC) (Circle.edge circleb) 
+    → Point= (Segment.point1 BC) (Circle.center circleb) 
+    → Point= (EquilTri.p1 DAB) (Circle.center circled) 
+    → Point= (EquilTri.p2 DAB) A
+    → Point= (EquilTri.p3 DAB) (Circle.center circleb) 
+    → Segment= (segment A (Circle.edge circled)) BC 
+prop2 a (segment b c) (circle .b .c g) (circle d l redge) (equiltri .d .a .b sideab sidebd sidedb) point= point= point= point= point= 
+    = seg-trans (segment a l) (segment b g) (segment b c) 
+        (segment-minus= 
+            (segment d l) (segment d g) 
+            (segment d a) (segment d b) 
+            (segment a l) (segment b g) (Circle.radius= (circle d l g)) (EquilTri.side32' (equiltri d a b sideab sidebd sidedb))) -- ?0 : Segment= (segment a l) (segment b g)
+        (Circle.radius= (circle b g c)) 
+    where 
+        da=db : Segment= (segment b d) (segment d a) 
+        da=db = EquilTri.side23 (equiltri d a b sideab sidebd sidedb) 
+
+    
+-- prop2 a (segment b c) (circle .b .c g ) (circle d l redge1) point= point= =
+    --seg-trans (segment a l) (segment b g) (segment b c) {!   !} {!   !} 
+
