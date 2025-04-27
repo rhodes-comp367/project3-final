@@ -96,6 +96,12 @@ record EquilTri : Set where
     side3 : Segment
     side3 = record { point1 = p1 ; point2 = p2 }
 
+    side2' : Segment
+    side2' = record {point1 = p1; point2 = p3}
+
+    side32' : Segment= side3 side2'
+    side32' = seg-eq (segment p1 p2) (segment p1 p3) 
+
     field
         side12 : Segment= side1 side2
         side23 : Segment= side2 side3
@@ -111,13 +117,16 @@ record Circle : Set where
     radius : Segment
     radius = segment center redge
 
+    radius= : Segment= (segment center edge) (segment center redge) 
+    radius= = seg-eq (segment center edge) (segment center redge) 
+
 -- Axioms
 postulate
     -- Euclid Postulate 1 / Hilbert Inclidence 1
     drawLine : (A B : Point) → Line
     drawSeg : (A B : Point) → Segment
     -- Postulate 2
-    extendsSeg : (ab : Line) → (AB : Segment) → Line-Contains-Segment AB ab → Segment
+    extendsSeg : (ab : Line) (AB : Segment) (C : Point) → Line-Contains-Segment AB ab → Line-Contains-Point C ab → Segment
 
 
 if_then_else_ : {A : Set} → Bool → A → A → A
@@ -134,16 +143,20 @@ _and_ _ false = false
 
  
 -- Proposition 1: forming an equilateral triangle from a single segment
-create_equiTri : (ab : Segment) → (c1 c2 : Circle) 
+Prop-1 : (ab : Segment) → (c1 c2 : Circle) 
     → Point= (Circle.center c1) (Segment.point1 ab) → Point= (Circle.center c2) (Segment.point2 ab) 
     → Point= (Circle.redge c1) (Circle.center c2) → Point= (Circle.center c1) (Circle.redge c2) 
     → Point= (Circle.edge c1) (Circle.edge c2) → EquilTri
-create_equiTri (segment a b) (circle .a edge .b) (circle .b .edge .a) point= point= point= point= point= 
+Prop-1 (segment a b) (circle .a edge .b) (circle .b .edge .a) point= point= point= point= point= 
     = equiltri a b edge (seg-eq (segment b edge) (segment edge a)) (seg-eq (segment edge a) (segment a b)) (seg-eq (segment a  b) (segment b edge)) 
 
+-- application of Proposition 1: From a segment, identify a third point that would form an equilateral triangle
+create_equiTri : (ab : Segment) (c : Point) → EquilTri 
+create_equiTri (segment A B) C = equiltri A B C (seg-eq (segment B C) (segment C A)) ((seg-eq (segment C A) (segment A B))) ((seg-eq (segment A B) (segment B C)))
+
 postulate
-    -- application of Proposition 1: From a segment, identify a third point that would form an equilateral triangle
-    Pro-1 : (ab : Segment) → Point
+    segment-minus : Segment → Segment → Segment
+    segment-minus= : (DL DG DA DB AL BG : Segment) → Segment= DL DG → Segment= DA DB → Segment= AL BG
 
 -- Helper for proporsition 2
 seg-trans : (a b c : Segment) → Segment= a b → Segment= b c → Segment= a c
@@ -151,6 +164,22 @@ seg-trans a b c ab bc  = seg-eq a c
 
 seg-sym : (a b : Segment) → Segment= a b → Segment= b a 
 seg-sym a b ab = seg-eq b a
+
+subtract-equal : (DAB : EquilTri) → (DL DG : Segment) 
+  → Segment= DL DG
+  → Point= (Segment.point1 DL) (EquilTri.p1 DAB) → Point= (Segment.point1 DG) (EquilTri.p1 DAB)
+  → Segment= (segment-minus DL (EquilTri.side3 DAB)) (segment-minus DG (EquilTri.side2 DAB))
+ 
+subtract-equal (equiltri d a b side12 side23 side31) (segment .d l) (segment .d g) dl=dg point= point= = 
+    seg-trans 
+        (segment-minus (segment d l) (segment d a)) 
+        (segment-minus (segment d g) (segment d a)) 
+        (segment-minus (segment d g) (segment b d)) 
+        (seg-eq (segment-minus (segment d l) (segment d a))((segment-minus (segment d g) (segment d a)))) 
+        (seg-eq ((segment-minus (segment d g) (segment d a))) ((segment-minus (segment d g) (segment b d))))
+    where 
+        da=db : Segment= (segment b d) (segment d a) 
+        da=db = EquilTri.side23 (equiltri d a b side12 side23 side31) 
 
 -- Proposition 2
 SegSet : (a : Point) → (bc : Segment) → (ab : Segment) → (d : Point) → (abd : EquilTri) → (Cb Cd : Circle) → (al dl bg : Segment) 
@@ -161,7 +190,27 @@ SegSet : (a : Point) → (bc : Segment) → (ab : Segment) → (d : Point) → (
     → Segment= al bg 
 SegSet A (segment B C) (segment A B) D (equiltri A B D side12 side23 side31) 
     (circle B G C) (circle D G L) (segment A L) (segment D L) (segment B G) 
-    point= point= point= point= point= point= point= point= point= point= point= point=  point= point= point=  = seg-eq ((segment A L)) ((segment B G))
+    point= point= point= point= point= point= point= point= point= point= point= point= point= point= point= = seg-eq ((segment A L)) ((segment B G))
+
+-- Another proof
+prop2 : (A : Point) (BC : Segment) → (DAB : EquilTri) → (circle-B circle-D : Circle)
+    → Point= (Segment.point2 BC) (Circle.edge circle-B) 
+    → Point= (Segment.point1 BC) (Circle.center circle-B) 
+    → Point= (EquilTri.p1 DAB) (Circle.center circle-D) 
+    → Point= (EquilTri.p2 DAB) A
+    → Point= (EquilTri.p3 DAB) (Circle.center circle-B) 
+    → Segment= (segment A (Circle.edge circle-D)) BC 
+prop2 a (segment b c) (equiltri .d .a .b sideab sidebd sidedb) (circle .b .c g) (circle d l redge)
+    point= point= point= point= point= 
+    = seg-trans (segment a l) (segment b g) (segment b c) 
+        (segment-minus= 
+            (segment d l) (segment d g) 
+            (segment d a) (segment d b) 
+            (segment a l) (segment b g) (Circle.radius= (circle d l g)) (EquilTri.side32' (equiltri d a b sideab sidebd sidedb))) -- ?0 : Segment= (segment a l) (segment b g)
+        (Circle.radius= (circle b g c)) 
+    where 
+        da=db : Segment= (segment b d) (segment d a) 
+        da=db = EquilTri.side23 (equiltri d a b sideab sidebd sidedb) 
 
 -- Proposition 3
 
