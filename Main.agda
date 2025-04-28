@@ -262,6 +262,10 @@ postulate
     _<a_ : Angle → Angle → Set 
     _<s_ : Segment → Segment → Set
     ang-comp : (A B : Angle) → _<a_ A B
-     
-prop19 : (ABC : Triangle) → _<a_ (Triangle.angle1 ABC) (Triangle.angle2 ABC) → _<s_ (Triangle.side1 ABC) (Triangle.side2 ABC) 
-prop19 abc a = {!  !} 
+postulate
+    prop19-12 : (ABC : Triangle) → _<a_ (Triangle.angle1 ABC) (Triangle.angle2 ABC) → _<s_ (Triangle.side1 ABC) (Triangle.side2 ABC) 
+    prop19-21 : (ABC : Triangle) → _<a_ (Triangle.angle2 ABC) (Triangle.angle1 ABC) → _<s_ (Triangle.side2 ABC) (Triangle.side1 ABC) 
+    prop19-23 : (ABC : Triangle) → _<a_ (Triangle.angle2 ABC) (Triangle.angle3 ABC) → _<s_ (Triangle.side2 ABC) (Triangle.side3 ABC) 
+    prop19-32 : (ABC : Triangle) → _<a_ (Triangle.angle3 ABC) (Triangle.angle2 ABC) → _<s_ (Triangle.side3 ABC) (Triangle.side2 ABC) 
+    prop19-31 : (ABC : Triangle) → _<a_ (Triangle.angle3 ABC) (Triangle.angle1 ABC) → _<s_ (Triangle.side3 ABC) (Triangle.side1 ABC) 
+    prop19-13 : (ABC : Triangle) → _<a_ (Triangle.angle1 ABC) (Triangle.angle3 ABC) → _<s_ (Triangle.side1 ABC) (Triangle.side3 ABC) 
