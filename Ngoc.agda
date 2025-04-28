@@ -193,12 +193,6 @@ seg-trans a b c ab bc  = seg-eq a c
 seg-sym : (a b : Segment) → Segment= a b → Segment= b a 
 seg-sym a b ab = seg-eq b a
 
---dab : (A : Point) (BC : Segment) → (DAB : EquilTri) → (circleb circled : Circle) 
---    → Point= (EquilTri.p1 DAB) (Circle.center circled) 
---    → Point= (EquilTri.p2 DAB) A
---    → Point= (EquilTri.p3 DAB) (Circle.center circleb) 
---    → Segment= (segment A (Circle.egde circled)) (segment (Segment.point1 BC) (Circle.redge circleb))
---dab = {!   !} 
 postulate
   segment-minus : Segment → Segment → Segment
   segment-minus= : (DL DG DA DB AL BG : Segment) → Segment= DL DG → Segment= DA DB → Segment= AL BG 
@@ -244,6 +238,9 @@ prop2 a (segment b c) (circle .b .c h) (circle d l g) (equiltri .d .a .b sideab 
 create-equiTri' : (ab : Segment) → Point → EquilTri 
 create-equiTri' (segment A B) C = equiltri A B C (seg-eq (segment B C) (segment C A)) ((seg-eq (segment C A) (segment A B))) ((seg-eq (segment A B) (segment B C)))
 
+l-intersection : (DLG : Circle) → (DA : Segment) → Point= (Circle.center DLG) (Segment.point1 DA) → Point
+l-intersection (circle d k g) (segment .d a) point= = intersection (circle d k g) (segment d a) 
+
 prop2' :  {L : Point} (A : Point) → (BC : Segment) → Segment= (segment A L) BC
 prop2'  a bc = 
     let 
@@ -257,7 +254,12 @@ prop2'  a bc =
         dlg {k} = circle (EquilTri.p3 abd) k (Circle.redge bch) 
             
     in  
-        seg-trans (segment a {!  !}   ) {!   !} {!   !} {!   !} {!   !} 
+        seg-trans 
+            (segment a {!  !} ) 
+            (segment (Segment.point1 bc) (Circle.redge bch))  
+            bc 
+            {!   !} 
+            {!   !} 
     
         
 
