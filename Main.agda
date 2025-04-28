@@ -159,9 +159,11 @@ Prop-1 (segment a b) (circle .a edge .b) (circle .b .edge .a) point= point= poin
     = equiltri a b edge (seg-eq (segment b edge) (segment edge a)) (seg-eq (segment edge a) (segment a b)) (seg-eq (segment a  b) (segment b edge)) 
 
 -- application of Proposition 1: From a segment, identify a third point that would form an equilateral triangle
-create_equiTri : (ab : Segment) (c : Point) → EquilTri 
-create_equiTri (segment A B) C = equiltri A B C (seg-eq (segment B C) (segment C A)) ((seg-eq (segment C A) (segment A B))) ((seg-eq (segment A B) (segment B C)))
+create-equiTri : (ab : Segment) (c : Point) → EquilTri 
+create-equiTri (segment A B) C = equiltri A B C (seg-eq (segment B C) (segment C A)) ((seg-eq (segment C A) (segment A B))) ((seg-eq (segment A B) (segment B C)))
 
+
+-- Helper for proposition 2
 postulate
     segment-minus : Segment → Segment → Segment
     segment-minus= : (DL DG DA DB AL BG : Segment) → Segment= DL DG → Segment= DA DB → Segment= AL BG
@@ -178,7 +180,8 @@ SegSet A (segment B C) (segment A B) D (equiltri A B D side12 side23 side31)
     point= point= point= point= point= point= point= point= point= point= point= point= point= point= point= = seg-eq ((segment A L)) ((segment B G))
 
 -- Another proof
-prop2 : (A : Point) (BC : Segment) → (ABD : EquilTri) → (circleB circleD : Circle)
+prop2 : (A : Point) (BC : Segment) → (AB : Segment) → (ABD : EquilTri) → (circleB circleD : Circle)
+    → Point= A (Segment.point1 AB) → Point= (Segment.point1 BC) (Segment.point2 AB)
     → Point= (Segment.point2 BC) (Circle.edge circleB) 
     → Point= (Segment.point1 BC) (Circle.center circleB) 
     → Point= (EquilTri.p3 ABD) (Circle.center circleD) 
@@ -186,17 +189,20 @@ prop2 : (A : Point) (BC : Segment) → (ABD : EquilTri) → (circleB circleD : C
     → Point= (EquilTri.p2 ABD) (Circle.center circleB) 
     → Point= (intersection circleD (EquilTri.side2 ABD)) (Circle.edge circleD) 
     → Segment= (segment A (Circle.edge circleD)) BC 
-prop2 a (segment b c) (equiltri a b d side12 side23 side31) (circle .b .c h) (circle d l g)
-    point= point= point= point= point= l= =
+prop2 a (segment b c) (segment a b) (equiltri a b d side12 side23 side31) (circle .b .c h) (circle d l g)
+    point= point= point= point= point= point= point= l= =
     seg-trans (segment a l) (segment b g) (segment b c)
         (segment-minus=
         (segment d l) (segment d g)
         (segment d a) (segment d b)
         (segment a l) (segment b g)
         (Circle.radius= (circle d l g))
-        (EquilTri.side21' (equiltri a b d side12 side23 side31)))
-        --(seg-eq (EquilTri.side2 (equiltri a b d side12 side23 side31)) (seg-inverse (EquilTri.side1 (equiltri a b d side12 side23 side31)))))
+        (EquilTri.side21' abd))
+        --(seg-eq (EquilTri.side2 (equiltri a b d side12 side23 side31)) (seg-inverse (EquilTri.side1 (equiltri a b d side12 side23 side31))))
         (Circle.radius= (circle b g c)) 
+    where
+        abd : EquilTri  
+        abd = create-equiTri (segment a b) {!   !} 
 
 -- Proposition 3
 
