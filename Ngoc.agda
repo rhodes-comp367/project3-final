@@ -244,8 +244,8 @@ l-intersection (circle d k g) (segment .d a) point= = intersection (circle d k g
 prop2' :  {L : Point} (A : Point) → (BC : Segment) → Segment= (segment A L) BC
 prop2'  a bc = 
     let 
-        bch : {G : Point} → Circle
-        bch {g} = circle (Segment.point1 bc)  (Segment.point2 bc) g  
+        bgc : {G : Point} → Circle
+        bgc {g} = circle (Segment.point1 bc) g (Segment.point2 bc)
             
         abd : {D : Point} →  EquilTri
         abd {d} = create-equiTri' (segment a (Segment.point1 bc)) d 
