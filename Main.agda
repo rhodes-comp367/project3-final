@@ -155,11 +155,18 @@ Prop-1 : (ab : Segment) → (c1 c2 : Circle)
     → Point= (Circle.center c1) (Segment.point1 ab) → Point= (Circle.center c2) (Segment.point2 ab) 
     → Point= (Circle.redge c1) (Circle.center c2) → Point= (Circle.center c1) (Circle.redge c2) 
     → Point= (Circle.edge c1) (Circle.edge c2) → EquilTri
-Prop-1 (segment a b) (circle .a edge .b) (circle .b .edge .a) point= point= point= point= point= 
-    = equiltri a b edge (seg-eq (segment b edge) (segment edge a)) (seg-eq (segment edge a) (segment a b)) (seg-eq (segment a  b) (segment b edge)) 
+Prop-1 (segment a b) (circle a c b) (circle b c a) point= point= point= point= point= 
+    = equiltri a b c (seg-eq (segment b c) (segment c a)) (seg-eq (segment c a) (segment a b)) (seg-eq (segment a  b) (segment b c)) 
+
 
 -- application of Proposition 1: From a segment, identify a third point that would form an equilateral triangle
-create-equiTri : (ab : Segment) (c : Point) → EquilTri 
+create-equilPoint : (ab : Segment) → (c1 c2 : Circle) 
+    → Point= (Circle.center c1) (Segment.point1 ab) → Point= (Circle.center c2) (Segment.point2 ab) 
+    → Point= (Circle.redge c1) (Circle.center c2) → Point= (Circle.center c1) (Circle.redge c2) 
+    → Point= (Circle.edge c1) (Circle.edge c2) → Point
+create-equilPoint (segment a b) (circle a c b) (circle b c a) point= point= point= point= point= = c
+
+create-equiTri : (ab : Segment) → Point → EquilTri 
 create-equiTri (segment A B) C = equiltri A B C (seg-eq (segment B C) (segment C A)) ((seg-eq (segment C A) (segment A B))) ((seg-eq (segment A B) (segment B C)))
 
 
@@ -197,12 +204,33 @@ prop2 a (segment b c) (segment a b) (equiltri a b d side12 side23 side31) (circl
         (segment d a) (segment d b)
         (segment a l) (segment b g)
         (Circle.radius= (circle d l g))
-        (EquilTri.side21' abd))
+        (EquilTri.side21' (equiltri a b d side12 side23 side31)))
         --(seg-eq (EquilTri.side2 (equiltri a b d side12 side23 side31)) (seg-inverse (EquilTri.side1 (equiltri a b d side12 side23 side31))))
+        (Circle.radius= (circle b g c)) 
+
+
+-- Another proof (integrating prop-1)
+prop2' : (A : Point) (BC : Segment) → (AB : Segment) → (D : Point) → (AD : Segment) → (circleB circleD : Circle)
+    → Point= A (Segment.point1 AB) → Point= (Segment.point1 BC) (Segment.point2 AB)
+    → Point= A (Segment.point1 AD) → Point= D (Segment.point2 AD)
+    → Point= (Segment.point2 BC) (Circle.edge circleB) 
+    → Point= (Segment.point1 BC) (Circle.center circleB) 
+    → Point= D (Circle.center circleD)
+    → Point= D (Circle.edge circleD)
+    → Segment= (segment A (Circle.edge circleD)) BC 
+prop2' a (segment b c) (segment a b) d (segment a d) (circle .b .c h) (circle d l g)
+    point= point= point= point= point= point= point= point= =
+    seg-trans (segment a l) (segment b g) (segment b c)
+        (segment-minus=
+        (segment d l) (segment d g)
+        (segment d a) (segment d b)
+        (segment a l) (segment b g)
+        (Circle.radius= (circle d l g))
+        (seg-eq (EquilTri.side2 abd) (EquilTri.side1' abd)))
         (Circle.radius= (circle b g c)) 
     where
         abd : EquilTri  
-        abd = create-equiTri (segment a b) {!   !} 
+        abd = create-equiTri (segment a b) d 
 
 -- Proposition 3
 
@@ -228,4 +256,4 @@ prop6_ang23 : (t1 : Triangle) → Ang= (Triangle.angle2 t1) (Triangle.angle3 t1)
 prop6_ang23 record { p1 = point1 ; p2 = point2 ; p3 = point3 } ang= = seg= 
 
 prop6_ang31 : (t1 : Triangle) → Ang= (Triangle.angle3 t1) (Triangle.angle1 t1) → Seg= (Triangle.side3 t1) (Triangle.side1 t1)
-prop6_ang31 record { p1 = point1 ; p2 = point2 ; p3 = point3 } ang= = seg=   
+prop6_ang31 record { p1 = point1 ; p2 = point2 ; p3 = point3 } ang= = seg=    
