@@ -109,6 +109,8 @@ record EquilTri : Set where
         side23 : Segment= side2 side3
         side31 : Segment= side3 side1
 
+    side21' = seg-eq (segment p3 p1) (segment p3 p2)
+
 record Circle : Set where
     constructor
         circle
@@ -248,24 +250,26 @@ l-intersection : (DLG : Circle) → (DA : Segment) → Point= (Circle.center DLG
 l-intersection (circle d k g) (segment .d a) point= = intersection (circle d k g) (segment d a) 
 
 prop2' :  {L : Point} (A : Point) → (BC : Segment) → Segment= (segment A L) BC
-prop2'  a bc = 
+prop2' {l} a bc = 
     let 
-        bch : {G : Point} → Circle
-        bch {g} = circle (Segment.point1 bc)  (Segment.point2 bc) g  
+        bgc : {G : Point} → Circle
+        bgc {g} = circle (Segment.point1 bc) g (Segment.point2 bc)  
             
         abd : {D : Point} →  EquilTri
         abd {d} = create-equiTri' (segment a (Segment.point1 bc)) d 
 
-        dlg : {K : Point} → Circle
-        dlg {k} = circle (EquilTri.p3 abd) k (Circle.redge bch) 
+        dlg : {L : Point} → Circle
+        dlg {l} = circle (EquilTri.p3 abd) l (Circle.edge bgc) 
             
     in  
         seg-trans 
-            (segment a {!  !} ) 
-            (segment (Segment.point1 bc) (Circle.redge bch))  
-            bc 
-            {!   !} 
-            {!   !} 
+            (segment a (Circle.edge dlg)) (segment (Segment.point1 bc) (Circle.edge bgc)) bc 
+            (segment-minus= 
+                (segment (Circle.center dlg) (Circle.edge dlg)) (segment (Circle.center dlg) (Circle.redge dlg)) 
+                (segment (Circle.center dlg) a) (segment (Circle.center dlg) (Segment.point1 bc)) 
+                (segment a (Circle.edge dlg)) (segment (Segment.point1 bc) (Circle.redge dlg)) 
+                ({!   !}) ({!   !})) 
+            (Circle.radius= bgc) 
 
 
         
