@@ -24,13 +24,22 @@ record Segment : Set where
     field
         point1 point2 : Point
 
+data Seg= : Segment → Segment → Set where
+  seg= : ∀ {s1 s2} → Seg= s1 s2
+
 postulate
     Line-Contains-Segment : Segment → Line → Set
     Segment= : Segment → Segment → Set
     seg-eq : (s1 s2 : Segment) → Segment= s1 s2  
 
-data Seg= : Segment → Segment → Set where
-  seg= : ∀ {s1 s2} → Seg= s1 s2
+seg-trans : (a b c : Segment) → Segment= a b → Segment= b c → Segment= a c
+seg-trans a b c ab bc  = seg-eq a c 
+
+seg-sym : {a b : Segment} → Segment= a b → Segment= b a 
+seg-sym {a} {b} ab = seg-eq b a
+
+seg-inverse : Segment → Segment
+seg-inverse (segment a b) = segment b a
 
 
 postulate
@@ -47,17 +56,10 @@ record Angle : Set where
 postulate
     Angle= : Angle → Angle → Set
     ang-eq : (a1 a2 : Angle) → Angle= a1 a2  
-    
+
 data Ang= : Angle → Angle → Set where
   ang= : ∀ {a1 a2} → Ang= a1 a2
-
-record Triangle' : Set where
-    constructor
-        triangle 
-    field 
-        line1 : Line
-        line2 : Line
-        ang : Angle
+    
 
 record Triangle : Set where
     field
@@ -80,6 +82,7 @@ record Triangle : Set where
     
     angle3 : Angle
     angle3 = angle side1 side2
+
     
 record EquilTri : Set where
     constructor
@@ -90,29 +93,32 @@ record EquilTri : Set where
     side1 : Segment
     side1 = record { point1 = p2 ; point2 = p3 }
 
+    side1' = seg-inverse side1
+
     side2 : Segment
     side2 = record { point1 = p3 ; point2 = p1 }
 
+    side2' = seg-inverse side2
+
     side3 : Segment
-    side3 = record { point1 = p1 ; point2 = p2 }
+    side3 = record { point1 = p1 ; point2 = p2 } 
 
-    side2' : Segment
-    side2' = record {point1 = p1; point2 = p3}
-
-    side32' : Segment= side3 side2'
-    side32' = seg-eq (segment p1 p2) (segment p1 p3) 
+    side3' = seg-inverse side3
 
     field
         side12 : Segment= side1 side2
         side23 : Segment= side2 side3
         side31 : Segment= side3 side1
 
+    side21' = seg-eq (segment p3 p1) (segment p3 p2)
+
 -- Euclid's Postulate 3
 record Circle : Set where
     constructor
         circle
     field 
-        center edge redge : Point
+        center edge redge : Point -- redge is the primary point on the circle used to determine radius
+                                  -- edge is another point on the circle to help prove various proporsitions, can act as an intersecting point
 
     radius : Segment
     radius = segment center redge
@@ -141,6 +147,8 @@ _and_ true true = true
 _and_ false _ = false 
 _and_ _ false = false 
 
+postulate
+    intersection : Circle → Segment → Point -- Intersection of a line and a circle
  
 -- Proposition 1: forming an equilateral triangle from a single segment
 Prop-1 : (ab : Segment) → (c1 c2 : Circle) 
@@ -151,35 +159,14 @@ Prop-1 (segment a b) (circle .a edge .b) (circle .b .edge .a) point= point= poin
     = equiltri a b edge (seg-eq (segment b edge) (segment edge a)) (seg-eq (segment edge a) (segment a b)) (seg-eq (segment a  b) (segment b edge)) 
 
 -- application of Proposition 1: From a segment, identify a third point that would form an equilateral triangle
-create_equiTri : (ab : Segment) (c : Point) → EquilTri 
-create_equiTri (segment A B) C = equiltri A B C (seg-eq (segment B C) (segment C A)) ((seg-eq (segment C A) (segment A B))) ((seg-eq (segment A B) (segment B C)))
+create-equiTri : (ab : Segment) (c : Point) → EquilTri 
+create-equiTri (segment A B) C = equiltri A B C (seg-eq (segment B C) (segment C A)) ((seg-eq (segment C A) (segment A B))) ((seg-eq (segment A B) (segment B C)))
 
+
+-- Helper for proposition 2
 postulate
     segment-minus : Segment → Segment → Segment
     segment-minus= : (DL DG DA DB AL BG : Segment) → Segment= DL DG → Segment= DA DB → Segment= AL BG
-
--- Helper for proporsition 2
-seg-trans : (a b c : Segment) → Segment= a b → Segment= b c → Segment= a c
-seg-trans a b c ab bc  = seg-eq a c 
-
-seg-sym : (a b : Segment) → Segment= a b → Segment= b a 
-seg-sym a b ab = seg-eq b a
-
-subtract-equal : (DAB : EquilTri) → (DL DG : Segment) 
-  → Segment= DL DG
-  → Point= (Segment.point1 DL) (EquilTri.p1 DAB) → Point= (Segment.point1 DG) (EquilTri.p1 DAB)
-  → Segment= (segment-minus DL (EquilTri.side3 DAB)) (segment-minus DG (EquilTri.side2 DAB))
- 
-subtract-equal (equiltri d a b side12 side23 side31) (segment .d l) (segment .d g) dl=dg point= point= = 
-    seg-trans 
-        (segment-minus (segment d l) (segment d a)) 
-        (segment-minus (segment d g) (segment d a)) 
-        (segment-minus (segment d g) (segment b d)) 
-        (seg-eq (segment-minus (segment d l) (segment d a))((segment-minus (segment d g) (segment d a)))) 
-        (seg-eq ((segment-minus (segment d g) (segment d a))) ((segment-minus (segment d g) (segment b d))))
-    where 
-        da=db : Segment= (segment b d) (segment d a) 
-        da=db = EquilTri.side23 (equiltri d a b side12 side23 side31) 
 
 -- Proposition 2
 SegSet : (a : Point) → (bc : Segment) → (ab : Segment) → (d : Point) → (abd : EquilTri) → (Cb Cd : Circle) → (al dl bg : Segment) 
@@ -193,24 +180,29 @@ SegSet A (segment B C) (segment A B) D (equiltri A B D side12 side23 side31)
     point= point= point= point= point= point= point= point= point= point= point= point= point= point= point= = seg-eq ((segment A L)) ((segment B G))
 
 -- Another proof
-prop2 : (A : Point) (BC : Segment) → (DAB : EquilTri) → (circle-B circle-D : Circle)
-    → Point= (Segment.point2 BC) (Circle.edge circle-B) 
-    → Point= (Segment.point1 BC) (Circle.center circle-B) 
-    → Point= (EquilTri.p1 DAB) (Circle.center circle-D) 
-    → Point= (EquilTri.p2 DAB) A
-    → Point= (EquilTri.p3 DAB) (Circle.center circle-B) 
-    → Segment= (segment A (Circle.edge circle-D)) BC 
-prop2 a (segment b c) (equiltri .d .a .b sideab sidebd sidedb) (circle .b .c g) (circle d l redge)
-    point= point= point= point= point= 
-    = seg-trans (segment a l) (segment b g) (segment b c) 
-        (segment-minus= 
-            (segment d l) (segment d g) 
-            (segment d a) (segment d b) 
-            (segment a l) (segment b g) (Circle.radius= (circle d l g)) (EquilTri.side32' (equiltri d a b sideab sidebd sidedb))) -- ?0 : Segment= (segment a l) (segment b g)
+prop2 : (A : Point) (BC : Segment) → (AB : Segment) → (ABD : EquilTri) → (circleB circleD : Circle)
+    → Point= A (Segment.point1 AB) → Point= (Segment.point1 BC) (Segment.point2 AB)
+    → Point= (Segment.point2 BC) (Circle.edge circleB) 
+    → Point= (Segment.point1 BC) (Circle.center circleB) 
+    → Point= (EquilTri.p3 ABD) (Circle.center circleD) 
+    → Point= (EquilTri.p1 ABD) A
+    → Point= (EquilTri.p2 ABD) (Circle.center circleB) 
+    → Point= (intersection circleD (EquilTri.side2 ABD)) (Circle.edge circleD) 
+    → Segment= (segment A (Circle.edge circleD)) BC 
+prop2 a (segment b c) (segment a b) (equiltri a b d side12 side23 side31) (circle .b .c h) (circle d l g)
+    point= point= point= point= point= point= point= l= =
+    seg-trans (segment a l) (segment b g) (segment b c)
+        (segment-minus=
+        (segment d l) (segment d g)
+        (segment d a) (segment d b)
+        (segment a l) (segment b g)
+        (Circle.radius= (circle d l g))
+        (EquilTri.side21' abd))
+        --(seg-eq (EquilTri.side2 (equiltri a b d side12 side23 side31)) (seg-inverse (EquilTri.side1 (equiltri a b d side12 side23 side31))))
         (Circle.radius= (circle b g c)) 
-    where 
-        da=db : Segment= (segment b d) (segment d a) 
-        da=db = EquilTri.side23 (equiltri d a b sideab sidebd sidedb) 
+    where
+        abd : EquilTri  
+        abd = create-equiTri (segment a b) {!   !} 
 
 -- Proposition 3
 
@@ -236,4 +228,4 @@ prop6_ang23 : (t1 : Triangle) → Ang= (Triangle.angle2 t1) (Triangle.angle3 t1)
 prop6_ang23 record { p1 = point1 ; p2 = point2 ; p3 = point3 } ang= = seg= 
 
 prop6_ang31 : (t1 : Triangle) → Ang= (Triangle.angle3 t1) (Triangle.angle1 t1) → Seg= (Triangle.side3 t1) (Triangle.side1 t1)
-prop6_ang31 record { p1 = point1 ; p2 = point2 ; p3 = point3 } ang= = seg=  
+prop6_ang31 record { p1 = point1 ; p2 = point2 ; p3 = point3 } ang= = seg=   

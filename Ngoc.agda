@@ -241,8 +241,8 @@ prop2 a (segment b c) (circle .b .c h) (circle d l g) (equiltri .d .a .b sideab 
         (EquilTri.side32' (equiltri d a b sideab sidebd sidedb)))
         (Circle.radius= (circle b g c))
 
-create_equiTri' : (ab : Segment) (c : Point) → EquilTri 
-create_equiTri' (segment A B) C = equiltri A B C (seg-eq (segment B C) (segment C A)) ((seg-eq (segment C A) (segment A B))) ((seg-eq (segment A B) (segment B C)))
-
+    
+-- prop2 a (segment b c) (circle .b .c g ) (circle d l redge1) point= point= =
+    --seg-trans (segment a l) (segment b g) (segment b c) {!   !} {!   !} 
 
   
