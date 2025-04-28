@@ -257,3 +257,12 @@ prop6_ang23 record { p1 = point1 ; p2 = point2 ; p3 = point3 } ang= = seg=
 
 prop6_ang31 : (t1 : Triangle) → Ang= (Triangle.angle3 t1) (Triangle.angle1 t1) → Seg= (Triangle.side3 t1) (Triangle.side1 t1)
 prop6_ang31 record { p1 = point1 ; p2 = point2 ; p3 = point3 } ang= = seg=    
+
+postulate
+    angle-comp : Angle → Angle → Set
+    _<a_  : (a1 a2 : Angle) → angle-comp a1 a2
+    seg-comp : Segment → Segment → Set
+    _<s_ : (s1 s2 : Segment) → seg-comp s1 s2
+
+prop-19 : (ABC : Triangle) (a b : Angle) (x y : Segment) → angle-comp a b → seg-comp x y
+prop-19 abc (Triangle.angle1 abc) (Triangle.angle2 abc) (Triangle.side1 abc) (Triangle.side2 abc) = {!   !}
