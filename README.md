@@ -5,8 +5,8 @@
 - In the end, we postulated some of Euclid's and Hilbert's Axioms, proved proposition 1, 2, 4, 6, and postulated proposition 19
 
 # Cite any resources or existing code you used.
-- Euclid's Book 1: [link](http://aleph0.clarku.edu/~djoyce/elements/bookI/bookI.html)
-- Hilbert's Axioms: [https://en.wikipedia.org/wiki/Hilbert%27s_axioms]
+- [Euclide's Book 1](http://aleph0.clarku.edu/~djoyce/elements/bookI/bookI.html)
+- [Hilbert's Axioms](https://en.wikipedia.org/wiki/Hilbert%27s_axioms) 
 
 # Discuss any challenges, or anything you'd like feedback on.
 - Representing various geometric definitions and relations completely without algebra, so no measurement of length.
