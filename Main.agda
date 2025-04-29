@@ -269,3 +269,4 @@ postulate
     prop19-32 : (ABC : Triangle) → _<a_ (Triangle.angle3 ABC) (Triangle.angle2 ABC) → _<s_ (Triangle.side3 ABC) (Triangle.side2 ABC) 
     prop19-31 : (ABC : Triangle) → _<a_ (Triangle.angle3 ABC) (Triangle.angle1 ABC) → _<s_ (Triangle.side3 ABC) (Triangle.side1 ABC) 
     prop19-13 : (ABC : Triangle) → _<a_ (Triangle.angle1 ABC) (Triangle.angle3 ABC) → _<s_ (Triangle.side1 ABC) (Triangle.side3 ABC) 
+ 

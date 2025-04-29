@@ -249,6 +249,27 @@ create-equiTri' (segment A B) C = equiltri A B C (seg-eq (segment B C) (segment 
 l-intersection : (DLG : Circle) → (DA : Segment) → Point= (Circle.center DLG) (Segment.point1 DA) → Point
 l-intersection (circle d k g) (segment .d a) point= = intersection (circle d k g) (segment d a) 
 
+open import Agda.Builtin.Sigma using (Σ; _,_)
+-- (L : Point) × Segment= (segment A L) BC
+prop2'' : (A : Point) → (BC : Segment) → Σ Point (λ L → Segment= (segment A L) BC)
+prop2'' a bc = 
+    let 
+        bgc : {G : Point} → Circle
+        bgc {g} = circle (Segment.point1 bc) g (Segment.point2 bc)  
+            
+        abd : {D : Point} →  EquilTri
+        abd {d} = create-equiTri' (segment a (Segment.point1 bc)) d 
+
+        dlg : {L : Point} → Circle
+        dlg {k} = circle (EquilTri.p3 abd) k (Circle.edge bgc) 
+
+        l : Point
+        l = intersection dlg (segment (EquilTri.p3 abd) a) 
+            
+    in  
+        l , {!   !}
+
+
 prop2' :  {L : Point} (A : Point) → (BC : Segment) → Segment= (segment A L) BC
 prop2' {l} a bc = 
     let 
@@ -270,10 +291,5 @@ prop2' {l} a bc =
                 (segment a (Circle.edge dlg)) (segment (Segment.point1 bc) (Circle.redge dlg)) 
                 ({!   !}) ({!   !})) 
             (Circle.radius= bgc) 
-
-
-        
-
-
 
 
