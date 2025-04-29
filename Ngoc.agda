@@ -270,8 +270,8 @@ prop2'' a bc =
         l , {!   !}
 
 
-prop2' :  {L : Point} (A : Point) → (BC : Segment) → Segment= (segment A L) BC
-prop2' {l} a bc = 
+prop2' :  {L G D : Point} (A : Point) → (BC : Segment) → Segment= (segment A L) BC
+prop2' {l} {g} {d} a bc = 
     let 
         bgc : {G : Point} → Circle
         bgc {g} = circle (Segment.point1 bc) g (Segment.point2 bc)  
@@ -280,7 +280,7 @@ prop2' {l} a bc =
         abd {d} = create-equiTri' (segment a (Segment.point1 bc)) d 
 
         dlg : {L : Point} → Circle
-        dlg {l} = circle (EquilTri.p3 abd) l (Circle.edge bgc) 
+        dlg {l} = circle d l g 
             
     in  
         seg-trans 
@@ -289,7 +289,8 @@ prop2' {l} a bc =
                 (segment (Circle.center dlg) (Circle.edge dlg)) (segment (Circle.center dlg) (Circle.redge dlg)) 
                 (segment (Circle.center dlg) a) (segment (Circle.center dlg) (Segment.point1 bc)) 
                 (segment a (Circle.edge dlg)) (segment (Segment.point1 bc) (Circle.redge dlg)) 
-                ({!   !}) ({!   !})) 
+                (Circle.radius= dlg) (EquilTri.side21' abd )) 
             (Circle.radius= bgc) 
 
 
+ 
