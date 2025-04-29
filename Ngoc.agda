@@ -98,6 +98,9 @@ record EquilTri : Set where
     side3 : Segment
     side3 = record { point1 = p1 ; point2 = p2 }
 
+    side1' : Segment
+    side1' = record {point1 = p3; point2 = p1}
+
     side2' : Segment
     side2' = record {point1 = p1; point2 = p3}
 
@@ -151,42 +154,15 @@ _and_ _ false = false
 
  
 -- Proposition 1
-create_equiTri : (ab : Segment) → (c1 c2 : Circle) 
+Prop-1 : (ab : Segment) → (c1 c2 : Circle) 
     → Point= (Circle.center c1) (Segment.point1 ab) → Point= (Circle.center c2) (Segment.point2 ab) 
     → Point= (Circle.redge c1) (Circle.center c2) → Point= (Circle.center c1) (Circle.redge c2) 
     → Point= (Circle.edge c1) (Circle.edge c2) → EquilTri
-create_equiTri (segment a b) (circle .a edge .b) (circle .b .edge .a) point= point= point= point= point= 
+Prop-1 (segment a b) (circle .a edge .b) (circle .b .edge .a) point= point= point= point= point= 
     = equiltri a b edge (seg-eq (segment b edge) (segment edge a)) (seg-eq (segment edge a) (segment a b)) (seg-eq (segment a  b) (segment b edge)) 
-    
--- Proposition 2
-SegSet : (a : Point) → (bc : Segment) → (ad : Segment) → Point= (Segment.point1 ad) a → Seg= ad bc → Segment   
-SegSet a (segment b c) (segment .a d) point= seg= = segment a d
 
--- Proposition 3
-
-
--- Proposition 4
-sas-base : (t1 t2 : Triangle) → Segment= (Triangle.side1 t1) (Triangle.side1 t2) → Segment= (Triangle.side2 t1) (Triangle.side2 t2) 
-    → Angle= (Triangle.angle3 t1) (Triangle.angle3 t2) → Segment= (Triangle.side3 t1) (Triangle.side3 t2) 
-sas-base a b s1 s2 a3  = seg-eq (segment (Triangle.p1 a) (Triangle.p2 a)) (segment (Triangle.p1 b) (Triangle.p2 b)) 
-
-postulate 
-    -- Hilbert Congruence 6
-    sas-angle2 : (t1 t2 : Triangle) → Seg= (Triangle.side1 t1) (Triangle.side1 t2) → Seg= (Triangle.side2 t1) (Triangle.side2 t2) 
-        → Ang= (Triangle.angle3 t1) (Triangle.angle3 t2) → Ang= (Triangle.angle2 t1) (Triangle.angle2 t2)
-        
-    sas-angle3 : (t1 t2 : Triangle) → Seg= (Triangle.side1 t1) (Triangle.side1 t2) → Seg= (Triangle.side2 t1) (Triangle.side2 t2) 
-        → Ang= (Triangle.angle3 t1) (Triangle.angle3 t2) → Ang= (Triangle.angle3 t1) (Triangle.angle3 t2)
-
--- Proposition 6 : If in a triangle two angles equal one another, then the sides opposite the equal angles also equal one another.
-prop6_ang12 : (t1 : Triangle) → Ang= (Triangle.angle1 t1) (Triangle.angle2 t1) → Seg= (Triangle.side1 t1) (Triangle.side2 t1)
-prop6_ang12 record { p1 = point1 ; p2 = point2 ; p3 = point3 } ang= = seg=  
-
-prop6_ang23 : (t1 : Triangle) → Ang= (Triangle.angle2 t1) (Triangle.angle3 t1) → Seg= (Triangle.side2 t1) (Triangle.side3 t1)
-prop6_ang23 record { p1 = point1 ; p2 = point2 ; p3 = point3 } ang= = seg= 
-
-prop6_ang31 : (t1 : Triangle) → Ang= (Triangle.angle3 t1) (Triangle.angle1 t1) → Seg= (Triangle.side3 t1) (Triangle.side1 t1)
-prop6_ang31 record { p1 = point1 ; p2 = point2 ; p3 = point3 } ang= = seg=  
+create-equiTri : (ab : Segment) → Point → EquilTri 
+create-equiTri (segment A B) C = equiltri A B C (seg-eq (segment B C) (segment C A)) ((seg-eq (segment C A) (segment A B))) ((seg-eq (segment A B) (segment B C)))
 
 -- Start proving proposition 2: 
 seg-trans : (a b c : Segment) → Segment= a b → Segment= b c → Segment= a c
@@ -222,75 +198,92 @@ subtract-equal (equiltri d a b side12 side23 side31) (segment .d l) (segment .d 
         da=db = EquilTri.side23 (equiltri d a b side12 side23 side31) 
 
 postulate 
-    extend : (p1 p2 : Point) → Segment
-    
-prop2 : (A : Point) (BC : Segment) → (circleb circled : Circle) → (DAB : EquilTri)
-    → Point= (Segment.point2 BC) (Circle.edge circleb) 
-    → Point= (Segment.point1 BC) (Circle.center circleb) 
-    → Point= (EquilTri.p1 DAB) (Circle.center circled) 
-    → Point= (EquilTri.p2 DAB) A
-    → Point= (EquilTri.p3 DAB) (Circle.center circleb) 
-    → Point= (intersection circled (EquilTri.side3 DAB)) (Circle.edge circled) 
-    → Segment= (segment A (Circle.edge circled)) BC 
-prop2 a (segment b c) (circle .b .c h) (circle d l g) (equiltri .d .a .b sideab sidebd sidedb) point= point= point= point= point= l= =
-    
+    extend : (p1 p2 : Point) → Segment    
+
+-- Proposition 2
+SegSet : (a : Point) → (bc : Segment) → (ab : Segment) → (d : Point) → (abd : EquilTri) → (Cb Cd : Circle) → (al dl bg : Segment) 
+    → Point= a (Segment.point1 ab) → Point= (Segment.point1 bc) (Segment.point2 ab) → Point= a (EquilTri.p1 abd) → Point= (Segment.point1 bc) (EquilTri.p2 abd)  → Point= d (EquilTri.p3 abd)
+    → Point= a (Segment.point1 al) → Point= d (Segment.point1 dl) → Point= (Segment.point2 al) (Segment.point2 dl) → Point= (Segment.point1 bc) (Segment.point1 bg)
+    → Point= (Segment.point1 bc) (Circle.center Cb) → Point= (Segment.point2 bc) (Circle.redge Cb) → Point= (Segment.point2 bg) (Circle.edge Cb) -- → Segment= bc (Circle.radius Cb) 
+    → Point= d (Circle.center Cd) → Point= (Segment.point2 dl) (Circle.redge Cd) → Point= (Segment.point2 bg) (Circle.edge Cd) -- → Segment= dl (Circle.radius Cb)
+    → Segment= al bg 
+SegSet A (segment B C) (segment A B) D (equiltri A B D side12 side23 side31) 
+    (circle B G C) (circle D G L) (segment A L) (segment D L) (segment B G) 
+    point= point= point= point= point= point= point= point= point= point= point= point= point= point= point= = seg-eq ((segment A L)) ((segment B G))
+
+-- Another proof 
+prop2 : (A : Point) (BC : Segment) → (AB : Segment) → (D : Point) → (AD : Segment) → (circleB circleD : Circle)
+    → Point= A (Segment.point1 AB) → Point= (Segment.point1 BC) (Segment.point2 AB)
+    → Point= A (Segment.point1 AD) → Point= D (Segment.point2 AD)
+    → Point= (Segment.point2 BC) (Circle.edge circleB) 
+    → Point= (Segment.point1 BC) (Circle.center circleB) 
+    → Point= D (Circle.center circleD)
+    → Point= D (Circle.edge circleD)
+    → Segment= (segment A (Circle.edge circleD)) BC 
+prop2 a (segment b c) (segment a b) d (segment a d) (circle .b .c h) (circle d l g)
+    point= point= point= point= point= point= point= point= =
     seg-trans (segment a l) (segment b g) (segment b c)
         (segment-minus=
         (segment d l) (segment d g)
         (segment d a) (segment d b)
         (segment a l) (segment b g)
         (Circle.radius= (circle d l g))
-        (EquilTri.side32' (equiltri d a b sideab sidebd sidedb)))
-        (Circle.radius= (circle b g c))
+        (seg-eq (segment d a) (segment d b)))
+        (Circle.radius= (circle b g c)) 
+    where
+        abd : EquilTri  
+        abd = create-equiTri (segment a b) d 
 
-create-equiTri' : (ab : Segment) → Point → EquilTri 
-create-equiTri' (segment A B) C = equiltri A B C (seg-eq (segment B C) (segment C A)) ((seg-eq (segment C A) (segment A B))) ((seg-eq (segment A B) (segment B C)))
-
-l-intersection : (DLG : Circle) → (DA : Segment) → Point= (Circle.center DLG) (Segment.point1 DA) → Point
-l-intersection (circle d k g) (segment .d a) point= = intersection (circle d k g) (segment d a) 
-
-open import Agda.Builtin.Sigma using (Σ; _,_)
--- (L : Point) × Segment= (segment A L) BC
-prop2'' : (A : Point) → (BC : Segment) → Σ Point (λ L → Segment= (segment A L) BC)
-prop2'' a bc = 
+-- proposition 2 with improved type - 1
+prop-2 :  {L G D : Point} (A : Point) → (BC : Segment) → Segment= (segment A L) BC
+prop-2 {l} {g} {d} a bc = 
     let 
-        bgc : {G : Point} → Circle
-        bgc {g} = circle (Segment.point1 bc) g (Segment.point2 bc)  
+        bgc : Circle
+        bgc = circle (Segment.point1 bc) g (Segment.point2 bc)  
             
-        abd : {D : Point} →  EquilTri
-        abd {d} = create-equiTri' (segment a (Segment.point1 bc)) d 
+        abd : EquilTri
+        abd = create-equiTri (segment a (Segment.point1 bc)) d
 
-        dlg : {L : Point} → Circle
-        dlg {k} = circle (EquilTri.p3 abd) k (Circle.edge bgc) 
-
-        l : Point
-        l = intersection dlg (segment (EquilTri.p3 abd) a) 
-            
-    in  
-        l , {!   !}
-
-
-prop2' :  {L G D : Point} (A : Point) → (BC : Segment) → Segment= (segment A L) BC
-prop2' {l} {g} {d} a bc = 
-    let 
-        bgc : {G : Point} → Circle
-        bgc {g} = circle (Segment.point1 bc) g (Segment.point2 bc)  
-            
-        abd : {D : Point} →  EquilTri
-        abd {d} = create-equiTri' (segment a (Segment.point1 bc)) d 
-
-        dlg : {L : Point} → Circle
-        dlg {l} = circle d l g 
+        dlg : Circle
+        dlg = circle (EquilTri.p3 abd) l g 
             
     in  
         seg-trans 
             (segment a (Circle.edge dlg)) (segment (Segment.point1 bc) (Circle.edge bgc)) bc 
             (segment-minus= 
-                (segment (Circle.center dlg) (Circle.edge dlg)) (segment (Circle.center dlg) (Circle.redge dlg)) 
-                (segment (Circle.center dlg) a) (segment (Circle.center dlg) (Segment.point1 bc)) 
-                (segment a (Circle.edge dlg)) (segment (Segment.point1 bc) (Circle.redge dlg)) 
+                (segment (EquilTri.p3 abd) l) (segment (EquilTri.p3 abd) g) 
+                (segment (EquilTri.p3 abd) a) (segment (EquilTri.p3 abd) (Segment.point1 bc)) 
+                (segment a (Circle.edge dlg)) (segment (Segment.point1 bc) g) 
                 (Circle.radius= dlg) (EquilTri.side21' abd )) 
             (Circle.radius= bgc) 
+
+
+-- Proposition 4
+sas-base : (t1 t2 : Triangle) → Segment= (Triangle.side1 t1) (Triangle.side1 t2) → Segment= (Triangle.side2 t1) (Triangle.side2 t2) 
+    → Angle= (Triangle.angle3 t1) (Triangle.angle3 t2) → Segment= (Triangle.side3 t1) (Triangle.side3 t2) 
+sas-base a b s1 s2 a3  = seg-eq (segment (Triangle.p1 a) (Triangle.p2 a)) (segment (Triangle.p1 b) (Triangle.p2 b)) 
+
+postulate 
+    -- Hilbert Congruence 6
+    sas-angle2 : (t1 t2 : Triangle) → Seg= (Triangle.side1 t1) (Triangle.side1 t2) → Seg= (Triangle.side2 t1) (Triangle.side2 t2) 
+        → Ang= (Triangle.angle3 t1) (Triangle.angle3 t2) → Ang= (Triangle.angle2 t1) (Triangle.angle2 t2)
+        
+    sas-angle3 : (t1 t2 : Triangle) → Seg= (Triangle.side1 t1) (Triangle.side1 t2) → Seg= (Triangle.side2 t1) (Triangle.side2 t2) 
+        → Ang= (Triangle.angle3 t1) (Triangle.angle3 t2) → Ang= (Triangle.angle3 t1) (Triangle.angle3 t2)
+
+-- Proposition 6 : If in a triangle two angles equal one another, then the sides opposite the equal angles also equal one another.
+prop6_ang12 : (t1 : Triangle) → Ang= (Triangle.angle1 t1) (Triangle.angle2 t1) → Seg= (Triangle.side1 t1) (Triangle.side2 t1)
+prop6_ang12 record { p1 = point1 ; p2 = point2 ; p3 = point3 } ang= = seg=  
+
+prop6_ang23 : (t1 : Triangle) → Ang= (Triangle.angle2 t1) (Triangle.angle3 t1) → Seg= (Triangle.side2 t1) (Triangle.side3 t1)
+prop6_ang23 record { p1 = point1 ; p2 = point2 ; p3 = point3 } ang= = seg= 
+
+prop6_ang31 : (t1 : Triangle) → Ang= (Triangle.angle3 t1) (Triangle.angle1 t1) → Seg= (Triangle.side3 t1) (Triangle.side1 t1)
+prop6_ang31 record { p1 = point1 ; p2 = point2 ; p3 = point3 } ang= = seg=  
+
+
+    
+
 
 
  

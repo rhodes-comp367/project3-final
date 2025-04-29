@@ -3,7 +3,7 @@ module Main where
 open import Agda.Builtin.Nat
 open import Agda.Builtin.Bool
 open import Relation.Binary.PropositionalEquality using (_≡_; refl)
-
+open import Agda.Builtin.Sigma using (Σ; _,_)
 
 -- Definitions
 postulate 
@@ -119,35 +119,14 @@ record Circle : Set where
     constructor
         circle
     field 
-        center edge redge : Point -- redge is the primary point on the circle used to determine radius
-                                  -- edge is another point on the circle to help prove various proporsitions, can act as an intersecting point
-
-    radius : Segment
-    radius = segment center redge
-
-    radius= : Segment= (segment center edge) (segment center redge) 
-    radius= = seg-eq (segment center edge) (segment center redge) 
-
--- Defining Circle without edge as field
-record Circle1 : Set where
-    constructor
-        circle1
-    field 
         center redge : Point 
-
-    --edge : Point
     
     radius : Segment
     radius = segment center redge
 
-    --radius= : Segment= (segment center edge) (segment center redge) 
-    --radius= = seg-eq (segment center edge) (segment center redge) 
-
 postulate
-    circle-intersection : (c1 c2 : Circle1) → Point
+    circle-intersection : (c1 c2 : Circle) → Point
 
-
--- Axioms
 postulate
     -- Euclid Postulate 1 / Hilbert Inclidence 1
     drawLine : (A B : Point) → Line
@@ -169,29 +148,35 @@ _and_ false _ = false
 _and_ _ false = false 
 
 postulate
-    intersection : Circle → Segment → Point -- Intersection of a line and a circle
-    intersection1 : Circle1 → Segment → Point -- Intersection of a line and a Circle1
+    intersection : Circle → Segment → Point -- Intersection of a line and a Circle1
 
 
 
 -- Proposition 1: forming an equilateral triangle from a single segment
-Prop-1 : (ab : Segment) → (c1 c2 : Circle) 
-    → Point= (Circle.center c1) (Segment.point1 ab) → Point= (Circle.center c2) (Segment.point2 ab) 
-    → Point= (Circle.redge c1) (Circle.center c2) → Point= (Circle.center c1) (Circle.redge c2) 
-    → Point= (Circle.edge c1) (Circle.edge c2) → EquilTri
-Prop-1 (segment a b) (circle a c b) (circle b c a) point= point= point= point= point= 
-    = equiltri a b c (seg-eq (segment b c) (segment c a)) (seg-eq (segment c a) (segment a b)) (seg-eq (segment a  b) (segment b c)) 
+prop-1 : (ab : Segment) → EquilTri
+prop-1 (segment a b) =
+    let 
+        c1 : Circle
+        c1 = circle a b
 
+        c2 : Circle
+        c2 = circle b a
+
+        c : Point 
+        c = circle-intersection c1 c2
+    in
+        equiltri a b c (seg-eq (segment b c) (segment c a)) (seg-eq (segment c a) (segment a b)) (seg-eq (segment a  b) (segment b c)) 
+  
 
 -- application of Proposition 1: From a segment, identify a third point that would form an equilateral triangle
 create-equilPoint : (ab : Segment) → Point
 create-equilPoint (segment a b) =
     let 
-        c1 : Circle1
-        c1 = circle1 a b
+        c1 : Circle
+        c1 = circle a b
 
-        c2 : Circle1
-        c2 = circle1 b a
+        c2 : Circle
+        c2 = circle b a
 
         c : Point 
         c = circle-intersection c1 c2
@@ -206,98 +191,37 @@ create-equiTri : (ab : Segment) → Point → EquilTri
 create-equiTri (segment A B) C = equiltri A B C (seg-eq (segment B C) (segment C A)) ((seg-eq (segment C A) (segment A B))) ((seg-eq (segment A B) (segment B C)))
 
 
-
-
 -- Helper for proposition 2
 postulate
     segment-minus : Segment → Segment → Segment
     segment-minus= : (DL DG DA DB AL BG : Segment) → Segment= DL DG → Segment= DA DB → Segment= AL BG
 
 -- Proposition 2
-SegSet : (a : Point) → (bc : Segment) → (ab : Segment) → (d : Point) → (abd : EquilTri) → (Cb Cd : Circle) → (al dl bg : Segment) 
-    → Point= a (Segment.point1 ab) → Point= (Segment.point1 bc) (Segment.point2 ab) → Point= a (EquilTri.p1 abd) → Point= (Segment.point1 bc) (EquilTri.p2 abd)  → Point= d (EquilTri.p3 abd)
-    → Point= a (Segment.point1 al) → Point= d (Segment.point1 dl) → Point= (Segment.point2 al) (Segment.point2 dl) → Point= (Segment.point1 bc) (Segment.point1 bg)
-    → Point= (Segment.point1 bc) (Circle.center Cb) → Point= (Segment.point2 bc) (Circle.redge Cb) → Point= (Segment.point2 bg) (Circle.edge Cb) -- → Segment= bc (Circle.radius Cb) 
-    → Point= d (Circle.center Cd) → Point= (Segment.point2 dl) (Circle.redge Cd) → Point= (Segment.point2 bg) (Circle.edge Cd) -- → Segment= dl (Circle.radius Cb)
-    → Segment= al bg 
-SegSet A (segment B C) (segment A B) D (equiltri A B D side12 side23 side31) 
-    (circle B G C) (circle D G L) (segment A L) (segment D L) (segment B G) 
-    point= point= point= point= point= point= point= point= point= point= point= point= point= point= point= = seg-eq ((segment A L)) ((segment B G))
-
--- Another proof
-prop2 : (A : Point) (BC : Segment) → (AB : Segment) → (D : Point) → (AD : Segment) → (circleB circleD : Circle)
-    → Point= A (Segment.point1 AB) → Point= (Segment.point1 BC) (Segment.point2 AB)
-    → Point= A (Segment.point1 AD) → Point= D (Segment.point2 AD)
-    → Point= (Segment.point2 BC) (Circle.edge circleB) 
-    → Point= (Segment.point1 BC) (Circle.center circleB) 
-    → Point= D (Circle.center circleD)
-    → Point= D (Circle.edge circleD)
-    → Segment= (segment A (Circle.edge circleD)) BC 
-prop2 a (segment b c) (segment a b) d (segment a d) (circle .b .c h) (circle d l g)
-    point= point= point= point= point= point= point= point= =
-    seg-trans (segment a l) (segment b g) (segment b c)
-        (segment-minus=
-        (segment d l) (segment d g)
-        (segment d a) (segment d b)
-        (segment a l) (segment b g)
-        (Circle.radius= (circle d l g))
-        (seg-eq (EquilTri.side2 abd) (EquilTri.side1' abd)))
-        (Circle.radius= (circle b g c)) 
-    where
-        abd : EquilTri  
-        abd = create-equiTri (segment a b) d 
-
--- proposition 2 with improved type - 1
-prop-2 :  {L G : Point} (A : Point) → (BC : Segment) → Segment= (segment A L) BC
-prop-2 {l} {g} a bc = 
-    let 
-        bgc : Circle
-        bgc = circle (Segment.point1 bc) g (Segment.point2 bc)  
-            
-        abd : EquilTri
-        abd = create-equiTri (segment a (Segment.point1 bc)) (create-equilPoint (segment a (Segment.point1 bc))) 
-
-        dlg : Circle
-        dlg = circle (EquilTri.p3 abd) l g 
-            
-    in  
-        seg-trans 
-            (segment a (Circle.edge dlg)) (segment (Segment.point1 bc) (Circle.edge bgc)) bc 
-            (segment-minus= 
-                (segment (EquilTri.p3 abd) l) (segment (EquilTri.p3 abd) g) 
-                (segment (EquilTri.p3 abd) a) (segment (EquilTri.p3 abd) (Segment.point1 bc)) 
-                (segment a (Circle.edge dlg)) (segment (Segment.point1 bc) g) 
-                (Circle.radius= dlg) (EquilTri.side21' abd )) 
-            (Circle.radius= bgc) 
-
--- Proposition 2 with improved type - 2
-open import Agda.Builtin.Sigma using (Σ; _,_)
--- (L : Point) × Segment= (segment A L) BC
-prop-2' : (A : Point) → (BC : Segment)  → Σ Point (λ L → Segment= (segment A L) BC)
-prop-2' a (segment b c) = 
+prop-2 : (A : Point) → (BC : Segment)  → Σ Point (λ L → Segment= (segment A L) BC)
+prop-2 a (segment b c) = 
     let 
         abd : EquilTri
         abd = create-equiTri (segment a b) (create-equilPoint (segment a b)) 
 
-        bc : Circle1
-        bc = circle1 b c 
+        bc : Circle
+        bc = circle b c 
             
-        dg : Circle1
-        dg = circle1 (EquilTri.p3 abd) (intersection1 bc (segment (EquilTri.p3 abd) b)) 
+        dg : Circle
+        dg = circle (EquilTri.p3 abd) (intersection bc (segment (EquilTri.p3 abd) b)) 
 
         l : Point
-        l = intersection1 dg (segment (EquilTri.p3 abd) a) 
+        l = intersection dg (segment (EquilTri.p3 abd) a) 
             
     in  
         l , seg-trans 
-            (segment a l) (segment b (Circle1.redge dg)) (segment b c) 
+            (segment a l) (segment b (Circle.redge dg)) (segment b c) 
             (segment-minus= 
-            (segment (EquilTri.p3 abd) l) (segment (EquilTri.p3 abd) (Circle1.redge dg)) 
+            (segment (EquilTri.p3 abd) l) (segment (EquilTri.p3 abd) (Circle.redge dg)) 
             (segment (EquilTri.p3 abd) a) (segment (EquilTri.p3 abd) b) 
-            (segment a l) (segment b (Circle1.redge dg)) 
-            (seg-eq (segment (EquilTri.p3 abd) l) (Circle1.radius dg)) --both DL and DG are radii of the circle dg 
+            (segment a l) (segment b (Circle.redge dg)) 
+            (seg-eq (segment (EquilTri.p3 abd) l) (Circle.radius dg)) --both DL and DG are radii of the circle dg 
             ((EquilTri.side21' abd ))) 
-            (seg-eq (segment b (Circle1.redge dg)) (segment b c)) --both BG and BC are radii of the circle bc 
+            (seg-eq (segment b (Circle.redge dg)) (segment b c)) --both BG and BC are radii of the circle bc 
 
 
 -- Proposition 4
@@ -334,4 +258,4 @@ postulate
     prop19-32 : (ABC : Triangle) → _<a_ (Triangle.angle3 ABC) (Triangle.angle2 ABC) → _<s_ (Triangle.side3 ABC) (Triangle.side2 ABC) 
     prop19-31 : (ABC : Triangle) → _<a_ (Triangle.angle3 ABC) (Triangle.angle1 ABC) → _<s_ (Triangle.side3 ABC) (Triangle.side1 ABC) 
     prop19-13 : (ABC : Triangle) → _<a_ (Triangle.angle1 ABC) (Triangle.angle3 ABC) → _<s_ (Triangle.side1 ABC) (Triangle.side3 ABC) 
-  
+    
